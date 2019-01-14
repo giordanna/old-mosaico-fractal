@@ -1,0 +1,909 @@
+﻿<!DOCTYPE html>
+
+<!--[if lt IE 7]> <html class="ie6 oldie"> <![endif]-->
+
+<!--[if IE 7]>    <html class="ie7 oldie"> <![endif]-->
+
+<!--[if IE 8]>    <html class="ie8 oldie"> <![endif]-->
+
+<!--[if gt IE 8]><!-->
+
+<html>
+
+<!--<![endif]-->
+
+<head>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5" />
+  <meta name="theme-color" content="#DC3521" />
+
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="description" content="Versão web da ferramenta Mosaico Fractal." />
+
+  <meta name="keywords" content="mosaico,fractal,arte,matemática" />
+
+  <meta name="author" content="Giordanna De Gregoriis" />
+
+  <title>Mosaico Fractal Web</title>
+
+  <link href="css/boilerplate.css" rel="stylesheet" type="text/css" />
+
+  <link href="css/portfolioResponsive.css" rel="stylesheet" type="text/css" />
+
+  <link href="css/portfolioStyle.css" rel="stylesheet" type="text/css" />
+
+  <link href="css/style.css" rel="stylesheet" type="text/css" />
+
+  <link href="css/form.css" rel="stylesheet" type="text/css" />
+
+    <!--[if lt IE 9]>
+
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+
+    <![endif]-->
+
+  <script type="text/javascript" src="js/respond.min.js"></script>
+
+  <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
+
+  <script type="text/javascript" src="js/d3.min.js"></script>
+
+  <script data-main="js/saveSvgAsPng.js" scr="js/require.js"></script>
+
+  <script type="text/javascript" src="js/saveSvgAsPng.js"></script>
+
+  <script type="text/javascript" src="js/FileSaver.js"></script>
+
+  <script type="text/javascript" src="js/Blob.js"></script>
+
+</head>
+
+  <body>
+
+    <div class="gridContainer">
+
+      <header class="fluid">
+
+        <a href="http://gior.hol.es/" title="Home">
+
+          <figure class="fluid logo textStyle"><img src="android-chrome-256x256.png" alt="logo do site" width="30px" /> HOME</figure>
+
+        </a>
+
+        <h1 class="fluid mainHeading">Mosaico <b>Fractal</b></h1>
+
+        <h6 class="fluid mainTagline textStyle">Crie imagens artísticas com a versão web da ferramenta Mosaico Fractal (<a href="https://github.com/giordanna/old-mosaico-fractal" target="_blank">código-fonte</a>).</h6>
+
+        <p class="fluid">O programa preenche um espaço utilizando estampas e utiliza a função zeta de Hurwitz para controlar suas áreas, assim permitindo que estas estampas sejam inseridas no espaço e por fim apresentando um resultado que se assemelha a um fractal geométrico, sendo também esteticamente agradável. Caso tenha interesse no estudo feito acerca desta técnica, acesse este <a href="http://gior.hol.es/docs/degregoriis2017utilizacao.pdf" target="_blank"><b>Trabalho de Conclusão de Curso</b></a>.</p>
+
+      </header>
+
+      <article class="fluid">
+
+        <section class="fluid">
+          <center>
+
+            <div class="form-style-6" id="formulario">
+              <label for="selectEstampa"><p>Estampa desejada para o preenchimento do espaço: </label>
+              <select id="selectEstampa" name="selectEstampa" onchange="resetarFundo(selectFundo.selectedIndex)">
+                <option value="estampaCirculo">Círculos</option>
+                <option value="estampaQuadrado">Quadrados</option>
+                <option value="estampaTriangulo">Triângulos</option>
+                <option value="estampaHilbert">Curva de Hilbert (atenção: meio lento)</option>
+              </select></p>
+
+              <label for="selectFundo"><p>Fundo de preenchimento atualmente escolhido: </label>
+              <select id="selectFundo" name="selectFundo" onchange="mudarFundo(this.selectedIndex)" autocomplete="off">
+                <option value="fundoQuadrado">Quadrado</option>
+                <option value="fundoCirculo">Círculo</option>
+                <option value="fundoCoracao">Coração</option>
+                <option value="fundoEstrela">Estrela</option>
+                <option value="fundoAnel">Anel</option>
+                <option value="fundoCranio">Crânio</option>
+                <option value="fundoAlien">Alien</option>
+                <option value="fundoPikachu">Pikachu</option>
+                <option value="fundoFantasma">Fantasma</option>
+                <option value="fundoDragao">Dragão</option>
+                <option value="fundoTrianguloSierpinski">Triângulo de Sierpinski</option>
+                <option value="fundoTapeteSierpinski">Tapete de Sierpinski</option>
+                <option value="fundoFlor">Flor</option>
+                <option value="fundoMondrian">Mondrian</option>
+                <option value="fundoIlhaKoch">Ilha de Koch</option>
+                <option value="fundoArvorePitagorica">Árvore Pitagórica</option>
+                <option value="fundoColarApolonio">Colar de Apolônio</option>
+              </select></p>
+
+              <label for="numeroQuantidade"><p>Estampas a serem inseridas (no máximo):</label>
+              <input type="number" id="numeroQuantidade" name="numeroQuantidade" step="10" min="50" max="2500" value="500" /></p>
+
+              <label for="valorCorEstampa"><p>Cor base das estampas: </label>
+              <input type="color" id="valorCorEstampa" name="valorCorEstampa" value="#000000" /></p>
+
+              <label for="valorCorFundo"><p>Cor do fundo de preenchimento: </label>
+              <input type="color" id="valorCorFundo" name="valorCorFundo" value="#FFFFFF" /></p>
+
+              <label for="valorCorFundoQuadro"><p>Cor do fundo do quadro (se tiver): </label>
+              <input type="color" id="valorCorFundoQuadro" name="valorCorFundoQuadro" value="#FFFFFF" /></p>
+
+              <button class="enviar" onclick="algoritmo(selectEstampa.selectedIndex, selectFundo.selectedIndex)">
+                CLIQUE PARA INICIAR
+              </button>
+            </div>
+            <div id="objetosSvg">
+
+              <div id="fundosSvg">
+
+                <object id="fundoQuadrado" style="display:block" data="fundos/fundoQuadrado.svg" type="image/svg+xml"></object>
+                <object id="fundoCirculo" style="display:none" data="fundos/fundoCirculo.svg" type="image/svg+xml"></object>
+                <object id="fundoCoracao" style="display:none" data="fundos/fundoCoracao.svg" type="image/svg+xml"></object>
+                <object id="fundoEstrela" style="display:none" data="fundos/fundoEstrela.svg" type="image/svg+xml"></object>
+                <object id="fundoAnel" style="display:none" data="fundos/fundoAnel.svg" type="image/svg+xml"></object>
+                <object id="fundoCranio" style="display:none" data="fundos/fundoCranio.svg" type="image/svg+xml"></object>
+                <object id="fundoAlien" style="display:none" data="fundos/fundoAlien.svg" type="image/svg+xml"></object>
+                <object id="fundoPikachu" style="display:none" data="fundos/fundoPikachu.svg" type="image/svg+xml"></object>
+                <object id="fundoFantasma" style="display:none" data="fundos/fundoFantasma.svg" type="image/svg+xml"></object>
+                <object id="fundoDragao" style="display:none" data="fundos/fundoDragao.svg" type="image/svg+xml"></object>
+                <object id="fundoTrianguloSierpinski" style="display:none" data="fundos/fundoTrianguloSierpinski.svg" type="image/svg+xml"></object>
+                <object id="fundoTapeteSierpinski" style="display:none" data="fundos/fundoTapeteSierpinski.svg" type="image/svg+xml"></object>
+                <object id="fundoFlor" style="display:none" data="fundos/fundoFlor.svg" type="image/svg+xml"></object>
+                <object id="fundoMondrian" style="display:none" data="fundos/fundoMondrian.svg" type="image/svg+xml"></object>
+                <object id="fundoIlhaKoch" style="display:none" data="fundos/fundoIlhaKoch.svg" type="image/svg+xml"></object>
+                <object id="fundoArvorePitagorica" style="display:none" data="fundos/fundoArvorePitagorica.svg" type="image/svg+xml"></object>
+                <object id="fundoColarApolonio" style="display:none" data="fundos/fundoColarApolonio.svg" type="image/svg+xml"></object>
+
+              </div>
+
+              <div id="painelPrincipal"></div>
+
+              <div class="form-style-6">
+                <p>
+                  <button id="salvarPng" style="display:none" class="enviar" onclick="salvarPNG(selectFundo.selectedIndex)">
+                    SALVAR PNG
+                  </button>
+                </p>
+                <p>
+                  <button id="salvarSvg" style="display:none" class="enviar" onclick="salvarSVG(selectFundo.selectedIndex)">
+                    SALVAR SVG
+                  </button>
+                </p>
+              </div>
+
+            </div>
+
+          </center>
+
+        </section>
+
+      </article>
+
+      <footer>
+
+        <section class="fluid footerSection zeroMargin_desktop zeroMargin_tablet">
+          <p class="paraContent footerTextContainer" id="data"></p>
+        </section>
+
+        <script type="text/javascript">
+          var d = new Date();
+          var n = d.getFullYear();
+          document.getElementById("data").innerHTML = "Mosaico Fractal © Giordanna De Gregoriis - " + n;
+        </script>
+
+      </footer>
+
+    </div>
+
+    <script type="text/javascript">
+      /* VARIÁVEIS GLOBAIS: nome das estampas, dos fundos, referência pra div das estampas e dos fundos */
+      var nomeEstampas = [],
+          nomeFundos = [],
+          fundosSvg = document.getElementById("fundosSvg"),
+          estampasDados = {
+            "estampaCirculo": [0, 0 ,50],
+            "estampaQuadrado": [ [-50,-50], [-50,50], [50,50], [50,-50] ],
+            "estampaTriangulo": [[-50,28.9], [0,-57.7], [50,28.9] ],
+            "estampaHilbert": [ [50,50], [4.945,50], [4.945,4.945], [32.418,4.945], [32.418,-32.417], [22.527,-32.417], [22.527,-4.945], [-22.527,-4.945], [-22.527,-32.417], [-32.417,-32.417], [-32.417,4.945], [-4.945,4.945], [-4.945,50], [-50,50], [-50,32.418], [-22.527,32.418], [-22.527,22.527], [-50,22.527], [-50,-50], [-4.945,-50], [-4.945,-22.527], [4.945,-22.527], [4.945,-50], [50,-50], [50,22.527], [22.527,22.527], [22.527,32.418], [50,32.418] ]
+          },
+          listaFormas = [],
+
+          constanteDados = {
+            "estampaCirculo": [0.00, 0],
+            "estampaQuadrado": [-0.075, -0.5],
+            "estampaTriangulo": [0.05, 2],
+            "estampaHilbert": [-0.075, -0.5],
+            "fundoQuadrado": [0.545, 3],
+            "fundoCirculo": [0.53, 3],
+            "fundoCoracao": [0.45, 3],
+            "fundoEstrela": [0.425, 3],
+            "fundoAnel": [0.275, 20],
+            "fundoCranio": [0.325, 5],
+            "fundoAlien": [0.4125, 3],
+            "fundoPikachu": [0.285, 5],
+            "fundoFantasma": [0.4, 3.5],
+            "fundoDragao": [0.21, 20],
+            "fundoTrianguloSierpinski": [0.15, 28],
+            "fundoTapeteSierpinski": [0.35, 15],
+            "fundoFlor": [0.23, 13],
+            "fundoMondrian": [0.35, 15],
+            "fundoIlhaKoch": [0.38, 4],
+            "fundoArvorePitagorica": [0.2, 10],
+            "fundoColarApolonio": [0.3, 10]
+          };
+
+      // preenche o array com os nomes das estampas
+      for(var i = 0; i < document.getElementById("selectEstampa").options.length; i++) {
+        nomeEstampas.push(document.getElementById("selectEstampa").options[i].value);
+      }
+
+      // preenche o array com os nomes dos fundos
+      for(var i = 0; i < document.getElementById("selectFundo").options.length; i++) {
+        nomeFundos.push(document.getElementById("selectFundo").options[i].value);
+      }
+
+      /*
+      quando o usuário escolhe um outro fundo, deixa este visível e
+      apaga os outros. também verifica se o painel está preenchido,
+      e o reinicia
+      */
+      function mudarFundo(fundoIdx) {
+
+        if( ! $('#painelPrincipal').is(':empty') ) {
+          $('#painelPrincipal').html('');
+          document.getElementById('salvarPng').style.display = "none";
+          document.getElementById('salvarSvg').style.display = "none";
+          document.getElementById('fundosSvg').style.display = "block";
+        }
+
+        for (var i = 0 ; i < nomeFundos.length ; i++) {
+
+          if (i == fundoIdx) {
+            document.getElementById(nomeFundos[i]).style.display = 'block';
+          }
+          else {
+            document.getElementById(nomeFundos[i]).style.display = 'none';
+          }
+
+        }
+
+      }
+
+
+      function resetarFundo(fundoIdx) {
+        if( ! $('#painelPrincipal').is(':empty') ) {
+          $('#painelPrincipal').html('');
+          document.getElementById('salvarPng').style.display = "none";
+          document.getElementById('salvarSvg').style.display = "none";
+          document.getElementById('fundosSvg').style.display = "block";
+          document.getElementById(nomeFundos[fundoIdx]).style.display = 'block';
+        }
+      }
+
+      function salvarPNG(fundoIdx) {
+
+        saveSvgAsPng(document.getElementById("svgPrincipal"),  "mosaico_" + nomeFundos[fundoIdx] + ".png", {scale: 10, encoderOptions: 1});
+
+      }
+
+      function salvarSVG(fundoIdx) {
+        try {
+            var isFileSaverSupported = !!new Blob();
+        } catch (e) {
+            alert("Erro: seu navegador não dá suporte pro tipo 'Blob'.");
+        }
+
+        var html = d3.select("#painelPrincipal").select("svg")
+            .attr("title", "mosaico_" + nomeFundos[fundoIdx])
+            .attr("version", 1.1)
+            .attr("xmlns", "http://www.w3.org/2000/svg")
+            .node().parentNode.innerHTML;
+
+        var blob = new Blob([html], {type: "image/svg+xml"});
+        saveAs(blob, "mosaico_" + nomeFundos[fundoIdx] + ".svg");
+      }
+
+      /* FUNÇÕES PARA ALTERAR POLÍGONO DE ESTAMPA */
+      function centroidePoligono(poligono) {
+
+        var x = 0, y = 0;
+        for (var i = 0 ; i < poligono.length ; i++) {
+          x += poligono[i][0];
+          y += poligono[i][1];
+        }
+        return [x / poligono.length * 1.0, y / poligono.length * 1.0];
+
+
+      }
+
+      function transladaPoligono(poligono, x, y) {
+        var temp = [];
+        for (var i = 0 ; i < poligono.length ; i++) {
+          temp.push([poligono[i][0] + x, poligono[i][1] + y]);
+        }
+        return temp;
+      }
+
+      function escalaForma(tipoEstampa, forma, escala) {
+        if (tipoEstampa == "estampaCirculo") {
+          return [forma[0], forma[1], forma[2] * escala];
+        }
+        else {
+          return escalaPoligono(forma, escala);
+        }
+      }
+
+      function transladaForma(tipoEstampa, forma, x, y) {
+
+        if (tipoEstampa == "estampaCirculo") {
+          return [forma[0] + x, forma[1] + y, forma[2]];
+        }
+        else {
+         return transladaPoligono(forma, x, y);
+        }
+      }
+
+      function rotacionaForma(tipoEstampa, forma, angulo) {
+
+        if (tipoEstampa == "estampaCirculo") {
+          return forma;
+        }
+        else {
+          return rotacionaPoligono(forma, angulo);
+        }
+      }
+
+      function escalaPoligono(poligono, s) {
+        var centroide = centroidePoligono(poligono);
+
+        var temp = transladaPoligono(poligono, -centroide[0], -centroide[1]);
+
+        for (var i = 0 ; i < temp.length ; i++) {
+          temp[i] = [temp[i][0] * s, temp[i][1] * s];
+        }
+        return transladaPoligono(temp, centroide[0], centroide[1]);
+      }
+
+      function rotacionaPoligono(poligono, angulo) {
+        var centroide = centroidePoligono(poligono),
+        x, y,
+        cos = Math.cos(angulo),
+        sen = Math.sin(angulo),
+        temp = transladaPoligono(poligono, -centroide[0], -centroide[1]);
+
+        for (var i = 0 ; i < temp.length ; i++) {
+          x = temp[i][0] * cos - temp[i][1] * sen;
+          y = temp[i][0] * sen + temp[i][1] * cos;
+          temp[i] = [x,y];
+        }
+        return transladaPoligono(temp, centroide[0], centroide[1]);
+      }
+
+      function pathToPoints(path, samples){
+
+        var tamanho = path.getTotalLength(),
+            passo = tamanho/samples,
+            pontos = [],
+            ponto;
+
+        for (var i = 0 ; i < tamanho ; i += passo ) {
+          ponto = path.getPointAtLength(i);
+          pontos.push([ponto.x, ponto.y]);
+        }
+
+        return pontos;
+
+      }
+
+      function pathParaArray(pathNome) {
+        var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute("d", document.getElementById(pathNome).getAttribute("d"));
+
+        return pathToPoints(path, 100);
+      }
+
+      // insere valores no circulo
+      function positionCircle(circle) {
+        circle.attr("cx", function(d) { return d[0]; })
+        .attr("cy", function(d) { return d[1]; });
+      }
+
+      // insere valores do poligono
+      function positionPath(path) {
+        path.attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+      }
+
+      /* INÍCIO: código para verificar se círculo está dentro do polígono */
+
+      function estaDentro(tipoEstampa, forma, arrayFundo) {
+
+        if (tipoEstampa == "estampaCirculo") {
+          return circuloDentro(forma, arrayFundo);
+        }
+        else {
+          return poligonoDentro(forma, arrayFundo);
+        }
+      }
+
+      /* função nova para testar múltiplos poligonos, com classes 'base' e 'ajuda' */
+      function estaDentroPoligonos(tipoEstampa, forma, poligonosFundo) {
+        var dentro = false;
+
+        for (var i = 0 ; i < poligonosFundo.length ; i++) {
+          if (poligonosFundo[i][0] == "base") {
+            if (estaDentro(tipoEstampa, forma, poligonosFundo[i][1])) {
+              dentro = true;
+            }
+          }
+          else {
+            if (estaTocando(tipoEstampa, forma, poligonosFundo[i][1])) {
+              return false;
+            }
+          }
+        }
+
+        return dentro;
+
+      }
+
+      function estaTocando(tipoEstampa, forma, poligonoFundo) {
+        if (tipoEstampa == "estampaCirculo") {
+          return interseccaoCirculo(forma, poligonoFundo);
+        }
+        else {
+          if (interseccaoPoligono(forma, poligonoFundo)) return true;
+          return interseccaoPoligono(poligonoFundo, forma);
+        }
+      }
+
+
+      function poligonoDentro(polygonTest, polygon) {
+
+        // verifica 1,2
+        for (var i = 0 ; i < polygonTest.length ; i++) {
+          if (!pointInPolygon(polygonTest[i], polygon)) {
+            return false;
+          }
+        }
+
+        // testa se arestas se tocam
+        var temp1 = polygon.slice(),
+            temp2 = polygonTest.slice();
+
+        temp1.push(polygon[0]);
+        temp2.push(polygonTest[0]);
+
+        for (var i = 0 ; i < temp2.length - 1; i++) {
+          for (var j = 0 ; j < temp1.length - 1; j++) {
+            if (interseccaoDuasLinhas([temp1[j], temp1[j + 1]], [temp2[i], temp2[i + 1]])) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }
+
+
+
+      function interseccaoPoligono(polygon1, polygon2) {
+
+        // testa se pontos estão dentro do poligono
+        for (var i = 0 ; i < polygon1.length ; i++) {
+          if (pointInPolygon(polygon1[i], polygon2)) {
+            return true;
+          }
+        }
+
+        // testa se arestas estão dentro do polígono
+        var temp1 = polygon1.slice(),
+            temp2 = polygon2.slice();
+
+        temp1.push(polygon1[0]);
+        temp2.push(polygon2[0]);
+
+        for (var i = 0 ; i < temp2.length - 1; i++) {
+          for (var j = 0 ; j < temp1.length - 1; j++) {
+            if (interseccaoDuasLinhas([temp1[j], temp1[j + 1]], [temp2[i], temp2[i + 1]])) {
+              return true;
+            }
+          }
+        }
+
+        return false;
+      }
+
+      function interseccaoDuasLinhas(linha1, linha2) {
+        var m1 = (linha1[1][1]-linha1[0][1]) / (linha1[1][0]-linha1[0][0]),
+            m2 = (linha2[1][1]-linha2[0][1]) / (linha2[1][0]-linha2[0][0]);
+
+        if (m1 == m2) return false;
+
+        var cx = ((linha1[0][1] - (linha1[0][0] * m1)) - (linha2[0][1] - (linha2[0][0] * m2))) / (m2 - m1);
+        return ((cx >= Math.min(linha1[0][0], linha1[1][0]) && cx <= Math.max(linha1[0][0], linha1[1][0])) && (cx >= Math.min(linha2[0][0], linha2[1][0]) && cx <= Math.max(linha2[0][0], linha2[1][0])));
+        }
+
+        function circuloDentro(circle, polygon) {
+        return pointInPolygon(circle, polygon)
+        && !polygonEdges(polygon).some(function(line) { return pointLineSegmentDistance(circle, line) < circle[2]; });
+        }
+
+        function interseccaoCirculo(circle, polygon) {
+        return pointInPolygon(circle, polygon)
+        || polygonEdges(polygon).some(function(line) { return pointLineSegmentDistance(circle, line) < circle[2]; });
+      }
+
+      function interseccaoDoisCirculos(circle1, circle2) {
+
+        var deltax = Math.abs(circle2[0] - circle1[0]),
+        deltay;
+
+        if (deltax < (circle2[2] + circle1[2])) {
+
+          deltay = Math.abs(circle2[1] - circle1[1]);
+          if (deltay < (circle2[2] + circle1[2])) {
+            return (Math.sqrt(Math.pow(circle1[0] - circle2[0], 2) + Math.pow(circle1[1] - circle2[1], 2)) >= (circle2[2] + circle1[2]));
+          }
+        }
+
+        return true;
+      }
+
+      function interseccaoForma(tipoEstampa, forma1, forma2) {
+        if (tipoEstampa == "estampaCirculo")
+          return !interseccaoDoisCirculos(forma1, forma2);
+        else
+          return interseccaoPoligono(forma1, forma2);
+      }
+
+      function polygonEdges(polygon) {
+        return polygon.map(function(p, i) {
+          return i ? [polygon[i - 1], p] : [polygon[polygon.length - 1], p];
+        });
+      }
+
+      function pointInPolygon(point, polygon) {
+        for (var n = polygon.length, i = 0, j = n - 1, x = point[0], y = point[1], inside = false; i < n; j = i++) {
+          var xi = polygon[i][0], yi = polygon[i][1],
+          xj = polygon[j][0], yj = polygon[j][1];
+
+          if ((yi > y != yj > y) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+            inside = !inside;
+          }
+        }
+        return inside;
+      }
+
+      function pointLineSegmentDistance(point, line) {
+        var v = line[0], w = line[1], d, t;
+        return Math.sqrt(pointPointSquaredDistance(point, (d = pointPointSquaredDistance(v, w))
+          ? ((t = ((point[0] - v[0]) * (w[0] - v[0]) + (point[1] - v[1]) * (w[1] - v[1])) / d) < 0 ? v
+            : t > 1 ? w
+            : [v[0] + t * (w[0] - v[0]), v[1] + t * (w[1] - v[1])])
+          : v));
+      }
+
+      function pointPointSquaredDistance(v, w) {
+        var dx = v[0] - w[0], dy = v[1] - w[1];
+        return dx * dx + dy * dy;
+      }
+      /* FIM: código para verificar se círculo está dentro do polígono */
+
+      function corAleatoria(faixa) {
+        var rgb = [];
+        rgb.push(Math.floor(Math.random() * faixa));  // red
+        rgb.push(Math.floor(Math.random() * faixa));  // green
+        rgb.push(Math.floor(Math.random() * faixa));  // blue
+
+        // find max and min indexes.
+        var max, min;
+
+        if (rgb[0] > rgb[1]){
+          max = (rgb[0] > rgb[2]) ? 0 : 2
+          min = (rgb[1] < rgb[2]) ? 1 : 2;
+        }
+        else{
+          max = (rgb[1] > rgb[2]) ? 1 : 2;
+          var notmax = 1 + max % 2;
+          min = (rgb[0] < rgb[notmax]) ? 0 : notmax;
+        }
+        rgb[max] = faixa - 1;
+        rgb[min] = 0;
+
+        function componentToHex(c) {
+            var hex = c.toString(16);
+            return hex.length == 1 ? "0" + hex : hex;
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+        }
+
+        return rgbToHex(rgb[0], rgb[1], rgb[2]);
+
+      }
+
+
+      // função zeta de Hurwitz
+      function funcaoZeta(c, N) {
+
+        var soma = 0,
+        NMAX = 100000;
+
+        for (var i = N; i < NMAX; i++) {
+          soma += Math.pow(i, -c);
+        }
+
+        return soma + soma_estimada(c, NMAX);
+      }
+
+      // valor utilizado na função zeta
+      function soma_estimada(c, NMAX) {
+
+        return (1.0 / (c - 1)) * Math.pow(NMAX, 1 - c);
+      }
+
+      // valor utilizado ao longo da execução
+      function valorControle(N, expoente) {
+
+        return Math.pow(N, -expoente);
+      }
+
+      function algoritmo(estampaIdx, fundoIdx) {
+
+        var corDaEstampa = document.getElementById("valorCorEstampa").value;
+        var corDoFundo = document.getElementById("valorCorFundo").value;
+        var corDoFundoQuadro = document.getElementById("valorCorFundoQuadro").value;
+
+        listaFormas = [];
+
+        // apaga o fundo escolhido visível
+        document.getElementById(nomeFundos[fundoIdx]).style.display = 'none';
+
+        document.getElementById('fundosSvg').style.display = "none";
+
+        // pega a(s) path(s) do fundo
+        var fundoSvg = document.getElementById(nomeFundos[fundoIdx]).contentDocument;
+
+        var pathsFundo = fundoSvg.getElementsByTagName('path');
+
+        // monta array de poligonos do fundo, com suas classes
+        var poligonosFundo = [];
+
+        for (var i = 0 ; i < pathsFundo.length ; i++) {
+          poligonosFundo.push([pathsFundo[i].getAttribute("class"), pathToPoints(pathsFundo[i], 200)]);
+        }
+
+        // pega o array da estampa
+        var arrayEstampa = estampasDados[nomeEstampas[estampaIdx]];
+
+        var tipoEstampa = nomeEstampas[estampaIdx];
+
+        var tipoFundo = nomeFundos[fundoIdx];
+
+        // reinicia o painel
+        if( ! $('#painelPrincipal').is(':empty') ) {
+          $('#painelPrincipal').html('');
+          document.getElementById('salvarPng').style.display = "none";
+          document.getElementById('salvarSvg').style.display = "none";
+        }
+
+        // declara variáveis que serão utilizadas para o preenchimento
+        var razaoDaArea,
+        constante = 1 + constanteDados[nomeFundos[fundoIdx]][0] + constanteDados[nomeEstampas[estampaIdx]][0],
+        expoente,
+        N = constanteDados[nomeFundos[fundoIdx]][1] + constanteDados[nomeEstampas[estampaIdx]][1];
+
+        if (nomeFundos[fundoIdx] == "fundoTrianguloSierpinski" && nomeEstampas[estampaIdx] == "estampaQuadrado") {
+          constante += 0.05;
+        }
+
+        // calcula valores a serem utilizados nesta execução: razão e expoente
+        razaoDaArea = 1.0 / funcaoZeta(constante, N);
+        expoente = 0.5 * constante;
+
+        // quando terminar o preenchimento, mostrar botão de salvar
+        $.when(preencherArea()).then( function (x) {
+          document.getElementById('salvarPng').style.display = "block";
+          document.getElementById('salvarSvg').style.display = "block";
+        });
+
+
+        function preencherArea() {
+
+          var x,
+          y,
+          escala,
+          largura = 100,
+          altura = 100,
+          numeroFormas = 0,
+          numeroIteracoes = 0,
+          maxIteracoes = 1000,
+          maxFormas = document.getElementById("numeroQuantidade").value;
+
+          // acesso ao svg de pintura
+          var painelPrincipal = d3.select("#painelPrincipal").append("svg")
+          .attr("id", "svgPrincipal")
+          .attr("xmlns", "http://www.w3.org/2000/svg")
+          .attr("preserveAspectRatio", "xMinYMin meet")
+          .attr("viewBox", "0 0 100 100")
+          .attr("width", "600")
+          .attr("height", "600");
+
+          painelPrincipal.append("rect")
+            .attr("x", "0")
+            .attr("y", "0")
+            .attr("width", "100")
+            .attr("height", "100")
+            .style("fill", corDoFundoQuadro);
+
+
+          for (var i = 0 ; i < pathsFundo.length ; i++) {
+            if (pathsFundo[i].getAttribute("class") == "base") {
+              painelPrincipal.append("path")
+                .attr("d", pathsFundo[i].getAttribute("d"))
+                .style("fill", corDoFundo);
+            }
+            else {
+              painelPrincipal.append("path")
+                .attr("d", pathsFundo[i].getAttribute("d"))
+                .style("fill", corDoFundoQuadro);
+            }
+          }
+
+
+            do {
+
+              // gera forma
+              var forma = gerarForma();
+
+              // só para de executar assim??
+              if (numeroFormas > maxFormas || numeroIteracoes > maxIteracoes) break;
+
+              if (forma != null) {
+
+
+                // adiciona forma
+                if (nomeEstampas[estampaIdx] == "estampaCirculo") {
+                  // círculo
+                  var grupo = painelPrincipal.append("g");
+
+                  grupo.append("circle")
+                    .datum(forma)
+                    .call(positionCircle)
+                    .attr('class', "")
+                    .style("fill", "#FFFFFF")
+                    .attr("r", function(d) { return d[2]; });
+
+                  grupo.append("circle")
+                    .datum(forma)
+                    .call(positionCircle)
+                    .attr('class', "")
+                    .style("fill", corDaEstampa)
+                    .style("fill-opacity", (Math.random() + .5) / 2)
+                    .attr("r", function(d) { return d[2]; });
+                }
+                else {
+                  // outros
+                  var grupo = painelPrincipal.append("g");
+
+                  grupo.append("path")
+                    .datum(forma)
+                    .attr('class', "")
+                    .style("fill", "#FFFFFF")
+                    .call(positionPath);
+                  grupo.append("path")
+                    .datum(forma)
+                    .attr('class', "")
+                    .style("fill", corDaEstampa)
+                    .style("fill-opacity", (Math.random() + .5) / 2)
+                    .call(positionPath);
+                }
+
+                listaFormas.push(forma);
+
+                N++;
+                numeroFormas++;
+              }
+              else {
+                // limite de tentativas de posicionar atingido... será que assim para??
+                numeroIteracoes = maxIteracoes + 1;
+                numeroFormas = maxFormas + 1;
+                break;
+              }
+
+
+            } while (numeroFormas < maxFormas && numeroIteracoes < maxIteracoes);
+
+          listaFormas = [];
+
+          function gerarForma() {
+
+            // gera valor de escala
+            escala = razaoDaArea * valorControle(N, expoente);
+            numeroIteracoes = 0;
+
+            var forma,
+            formaTransladada,
+            formaValida,
+            ponto,
+            dentroOuFora;
+
+            forma = escalaForma(tipoEstampa, arrayEstampa, escala);
+
+
+            while (numeroIteracoes < maxIteracoes) {
+
+              formaValida = true;
+
+              formaTransladada =  encontrarXY(forma);
+
+              if (x == -1 && y == -1) {
+                if (numeroFormas == 0) { // se nem a primeira forma consegue ser inserida, diminua o N
+                  N++;
+                }
+                return null;
+              }
+
+              for (var i = 0 ; i < listaFormas.length ; i++) {
+                if (interseccaoForma(tipoEstampa, formaTransladada, listaFormas[i])) {
+                  formaValida = false;
+                  break;
+                }
+              }
+
+              if (formaValida) {
+                return formaTransladada;
+              }
+
+              numeroIteracoes++;
+
+            }
+
+            return null;
+          }
+
+          function encontrarXY(forma) {
+            x = Math.random() * largura,
+            y = Math.random() * altura;
+
+            var iteracoes_posicao = 0;
+
+            var copiaForma = rotacionaForma(tipoEstampa, forma, Math.random() * 2 * Math.PI);
+            copiaForma = transladaForma(tipoEstampa, copiaForma, x, y);
+
+            while ( !estaDentroPoligonos(tipoEstampa, copiaForma, poligonosFundo) ){
+
+              x = Math.random() * largura,
+              y = Math.random() * altura;
+
+              copiaForma = rotacionaForma(tipoEstampa, forma, Math.random() * 2 * Math.PI);
+              copiaForma = transladaForma(tipoEstampa, copiaForma, x, y);
+
+              iteracoes_posicao++;
+              if (iteracoes_posicao > maxIteracoes) {
+                // passou do limite
+                x = -1; y = -1;
+                return;
+              }
+            }
+              // se chegou aqui, x e y são válidos
+
+            return copiaForma;
+
+          }
+        }
+      }
+    </script>
+
+  </body>
+
+  </html>
